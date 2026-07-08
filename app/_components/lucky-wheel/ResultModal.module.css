@@ -1,0 +1,55 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 9, 24, 0.72);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  padding: 20px;
+}
+
+.modal {
+  background: linear-gradient(160deg, #1e2150, #14162b);
+  border: 1px solid rgba(51, 54, 106, 0.6);
+  border-radius: 20px;
+  padding: 36px 32px;
+  max-width: 360px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+}
+
+.emoji {
+  font-size: 32px;
+  margin-bottom: 10px;
+}
+
+.kicker {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 13px;
+  color: #8b8fb8;
+  margin-bottom: 8px;
+}
+
+.winner {
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 600;
+  font-size: 26px;
+  color: #ffb020;
+  margin-bottom: 24px;
+  word-break: break-word;
+}
+
+.closeBtn {
+  background: #ffb020;
+  border: none;
+  border-radius: 999px;
+  padding: 10px 28px;
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  color: #101226;
+  cursor: pointer;
+}

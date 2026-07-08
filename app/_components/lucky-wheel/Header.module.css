@@ -1,0 +1,18 @@
+.header {
+  margin-bottom: 32px;
+  text-align: center;
+}
+
+.title {
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 600;
+  font-size: clamp(26px, 5vw, 38px);
+  margin: 0 0 8px;
+  letter-spacing: -0.5px;
+}
+
+.subtitle {
+  margin: 0;
+  font-size: 14px;
+  color: #8b8fb8;
+}

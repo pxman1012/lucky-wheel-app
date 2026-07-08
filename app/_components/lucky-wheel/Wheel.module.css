@@ -1,0 +1,128 @@
+.column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ---- Dial ---- */
+
+.wheelWrap {
+  position: relative;
+  width: min(420px, 90vw);
+  aspect-ratio: 1 / 1;
+  transition: transform 0.3s ease;
+}
+
+.wheelWrap:hover {
+  transform: scale(1.01);
+}
+
+.pointer {
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 14px solid transparent;
+  border-right: 14px solid transparent;
+  border-top: 26px solid #ffb020;
+  z-index: 3;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+}
+
+.dial {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 8px #1e2148,
+    0 20px 60px rgba(0, 0, 0, 0.5),
+    0 0 50px rgba(255, 176, 32, 0.15);
+  z-index: 1;
+}
+
+.segment {
+  position: absolute;
+  inset: 0;
+}
+
+.segmentLabel {
+  position: absolute;
+  top: 13%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 600;
+  color: #101226;
+  max-width: 84px;
+  text-align: center;
+  line-height: 1.15;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.centerCap {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: #101226;
+  border: 3px solid #2a2d5c;
+  z-index: 2;
+}
+
+/* ---- Spin button ---- */
+/* .spinWrap stays stationary on hover so the button's own translateY
+   doesn't shift it out from under the cursor (which would flicker). */
+
+.spinWrap {
+  display: inline-block;
+  padding: 6px;
+  margin-top: 22px;
+}
+
+.spinBtn {
+  width: 220px;
+  padding: 14px 0;
+  border-radius: 999px;
+  border: none;
+  background: #ffb020;
+  color: #101226;
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.2s ease;
+}
+
+.spinBtn:disabled {
+  background: #33366a;
+  color: #8b8fb8;
+  cursor: not-allowed;
+}
+
+.spinWrap:hover .spinBtn:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(255, 176, 32, 0.28);
+}
+
+.spinBtn:not(:disabled):active {
+  transform: translateY(0) scale(0.97);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dial,
+  .wheelWrap,
+  .spinBtn {
+    transition: none !important;
+  }
+}
