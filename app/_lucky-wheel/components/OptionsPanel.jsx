@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import styles from "./OptionsPanel.module.css";
-import { PALETTE } from "./constants";
+import { PALETTE } from "../constants";
 
 export default function OptionsPanel({
     options,

@@ -4,10 +4,10 @@ import { computeSegments } from "./utils";
 import { useOptions } from "./hooks/useOptions";
 import { useSpin } from "./hooks/useSpin";
 import { DEFAULT_OPTIONS } from "./constants";
-import Header from "./Header";
-import OptionsPanel from "./OptionsPanel";
-import Wheel from "./Wheel";
-import ResultModal from "./ResultModal";
+import Header from "./components/Header";
+import OptionsPanel from "./components/OptionsPanel";
+import Wheel from "./components/Wheel";
+import ResultModal from "./components/ResultModal";
 import styles from "./LuckyWheel.module.css";
 
 export default function LuckyWheel() {

@@ -1,4 +1,4 @@
-import LuckyWheel from "./_components/lucky-wheel";
+import LuckyWheel from "./_lucky-wheel";
 
 export default function Home() {
   return <LuckyWheel />;
