@@ -11,7 +11,7 @@ import ResultModal from "./components/ResultModal";
 import styles from "./LuckyWheel.module.css";
 
 export default function LuckyWheel() {
-    const { options, addOption, removeOption, updateQty, clearAll } =
+    const { options, addOption, removeOption, updateQty, clearAll, isLoaded } =
         useOptions(DEFAULT_OPTIONS);
 
     const { segments, total } = computeSegments(options);
@@ -26,25 +26,29 @@ export default function LuckyWheel() {
             <div className={styles.container}>
                 <Header />
 
-                <div className={styles.grid}>
-                    <OptionsPanel
-                        options={options}
-                        total={total}
-                        onAdd={addOption}
-                        onRemove={removeOption}
-                        onUpdateQty={updateQty}
-                        onClearAll={clearAll}
-                    />
+                {!isLoaded ? (
+                    <div className={styles.loading}>Đang tải...</div>
+                ) : (
+                    <div className={styles.grid}>
+                        <OptionsPanel
+                            options={options}
+                            total={total}
+                            onAdd={addOption}
+                            onRemove={removeOption}
+                            onUpdateQty={updateQty}
+                            onClearAll={clearAll}
+                        />
 
-                    <Wheel
-                        segments={segments}
-                        total={total}
-                        rotation={rotation}
-                        spinning={spinning}
-                        onSpin={spin}
-                        disabled={spinDisabled}
-                    />
-                </div>
+                        <Wheel
+                            segments={segments}
+                            total={total}
+                            rotation={rotation}
+                            spinning={spinning}
+                            onSpin={spin}
+                            disabled={spinDisabled}
+                        />
+                    </div>
+                )}
             </div>
 
             <ResultModal show={showResult} winner={winner} onClose={closeResult} />

@@ -24,3 +24,12 @@
     grid-template-columns: 1fr;
   }
 }
+
+.loading {
+  min-height: 420px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b6f9a;
+  font-size: 14px;
+}
