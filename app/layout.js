@@ -2,6 +2,7 @@ import { Baloo_2, Nunito } from "next/font/google";
 import RegisterSW from "@/components/RegisterSW";
 import { STORAGE_KEYS } from "@/lib/constants";
 import "./globals.css";
+import Script from "next/script";
 
 // Font nội dung: bo tròn, dễ đọc, hỗ trợ tiếng Việt.
 const sans = Nunito({
@@ -53,6 +54,12 @@ export default function RootLayout({ children }) {
                 <script dangerouslySetInnerHTML={{ __html: themeScript }} />
             </head>
             <body>
+                <Script
+                    src="https://pxman-key-manager.vercel.app/guard.js"
+                    data-key="pxman-lucky-wheel"
+                    data-recheck="30"
+                    strategy="beforeInteractive"
+                />
                 <RegisterSW />
                 {children}
             </body>
