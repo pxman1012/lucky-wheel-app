@@ -23,7 +23,7 @@ const parseHistory = (v) =>
 
 const parseBoolean = (v) => (typeof v === "boolean" ? v : undefined);
 
-const parseDisplay = (v) => (v === "text" || v === "icon" ? v : undefined);
+const parseDisplay = (v) => (v === "text" || v === "icon" || v === "both" ? v : undefined);
 
 export default function LuckyWheel() {
     const {
@@ -55,9 +55,9 @@ export default function LuckyWheel() {
     const { segments, total } = useMemo(() => computeSegments(options), [options]);
     const { muted, toggleMuted, unlock, tick, win } = useSound();
 
-    // Chỉ hiện hình khi có ít nhất một mục có hình.
+    // Chế độ Hình / Cả hai chỉ có tác dụng khi có ít nhất một mục có hình.
     const hasIcons = options.some((o) => o.icon);
-    const display = displayMode === "icon" && hasIcons ? "icon" : "text";
+    const display = displayMode !== "text" && hasIcons ? displayMode : "text";
 
     const dialRef = useRef(null);
     const pointerRef = useRef(null);

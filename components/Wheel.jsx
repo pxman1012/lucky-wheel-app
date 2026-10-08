@@ -8,32 +8,37 @@ import styles from "./Wheel.module.css";
 const SIZE = 400;
 const C = SIZE / 2; // tâm
 const R = SIZE / 2; // bán kính
-const LABEL_CENTER = 124; // khoảng cách từ tâm tới giữa nhãn chữ
-const LABEL_LENGTH = 122; // chiều dài tối đa của nhãn chữ
-const ICON_CENTER = 140; // khoảng cách từ tâm tới giữa icon
+const EDGE = 188; // mép ngoài của nội dung (cách rìa vòng 12 đơn vị) - hình và chữ đều căn từ đây
+const INNER = 58; // mép trong, chừa chỗ cho nút QUAY ở tâm
+const GAP = 8; // khoảng cách giữa hình và chữ
+const CENTER_BELOW = 9; // dưới số ô này: chữ căn giữa dải [INNER, mép ngoài] thay vì dính rìa
 
-function layoutLabel(label, sweep, count) {
-    const base = count <= 6 ? 22 : count <= 10 ? 18 : 15;
-    const arc = (2 * Math.PI * LABEL_CENTER * sweep) / 360; // bề ngang ô tại vị trí nhãn
+/** Cỡ chữ + nội dung đã cắt để vừa trong khoảng từ INNER tới `dEnd`. */
+function fitText(label, sweep, count, dEnd, shrink = 0) {
+    const length = dEnd - INNER;
+    const base =
+        (count <= 4 ? 26 : count <= 6 ? 22 : count <= 10 ? 18 : 15) - shrink;
+    const arc = (2 * Math.PI * ((dEnd + INNER) / 2) * sweep) / 360; // bề ngang ô quanh vùng chữ
     const fontSize = Math.max(9, Math.min(base, arc * 0.55));
-    const maxChars = Math.max(2, Math.floor(LABEL_LENGTH / (fontSize * 0.55)));
+    const maxChars = Math.max(2, Math.floor(length / (fontSize * 0.55)));
     return { fontSize, text: truncate(label, maxChars) };
 }
 
-function iconSize(sweep) {
-    const arc = (2 * Math.PI * ICON_CENTER * sweep) / 360;
-    return Math.max(16, Math.min(52, arc * 0.72));
+/** Cỡ hình vừa với bề ngang ô tại bán kính `radius`. */
+function fitIcon(sweep, max, radius = EDGE - 18) {
+    const arc = (2 * Math.PI * radius * sweep) / 360;
+    return Math.max(16, Math.min(max, arc * 0.72));
 }
 
-/** Icon trong một ô: emoji, cờ (cắt tròn) hoặc logo (nền trắng). */
-function SliceIcon({ icon, x, size, flip, clipId, onError }) {
+/** Icon trong một ô, tâm tại (cx, C): emoji, cờ (cắt tròn) hoặc logo (nền trắng). */
+function SliceIcon({ icon, cx, size, flip, clipId, onError }) {
     const half = size / 2;
-    const rotate = flip ? `rotate(180 ${x} ${C})` : undefined;
+    const rotate = flip ? `rotate(180 ${cx} ${C})` : undefined; // nửa trái: lật để hình luôn thẳng
 
     if (icon.type === "emoji") {
         return (
             <text
-                x={x}
+                x={cx}
                 y={C}
                 transform={rotate}
                 textAnchor="middle"
@@ -50,12 +55,12 @@ function SliceIcon({ icon, x, size, flip, clipId, onError }) {
     return (
         <g transform={rotate}>
             <clipPath id={clipId}>
-                <circle cx={x} cy={C} r={half} />
+                <circle cx={cx} cy={C} r={half} />
             </clipPath>
-            <circle cx={x} cy={C} r={half + 2} fill="#fff" />
+            <circle cx={cx} cy={C} r={half + 2} fill="#fff" />
             <image
                 href={icon.src}
-                x={x - box / 2}
+                x={cx - box / 2}
                 y={C - box / 2}
                 width={box}
                 height={box}
@@ -69,7 +74,14 @@ function SliceIcon({ icon, x, size, flip, clipId, onError }) {
 
 /**
  * Vòng quay dạng SVG. `dialRef` trỏ vào <svg> để useSpin ghi góc quay trực tiếp.
- * `display`: "text" hiện chữ, "icon" hiện hình (mục không có hình hoặc hình lỗi thì hiện chữ).
+ * `display`:
+ *   "text" - chỉ chữ
+ *   "icon" - chỉ hình (mục không có hình hoặc hình lỗi thì hiện chữ)
+ *   "both" - hình sát rìa ngoài, chữ nằm phía trong hình
+ *
+ * Vị trí chữ:
+ *   nhiều ô (>= CENTER_BELOW) - chữ dính rìa ngoài
+ *   ít ô (< CENTER_BELOW)     - chữ căn giữa dải bán kính, không bị trống ở giữa
  */
 export default function Wheel({
     segments,
@@ -83,6 +95,7 @@ export default function Wheel({
     const [brokenIcons, setBrokenIcons] = useState(() => new Set());
     const canSpin = total > 0 && !spinning;
     const only = segments.length === 1 ? segments[0] : null;
+    const centered = segments.length < CENTER_BELOW;
 
     const markBroken = (icon) => setBrokenIcons((prev) => new Set(prev).add(icon));
 
@@ -147,38 +160,86 @@ export default function Wheel({
                     {segments.map((s) => {
                         const flip = s.mid > 180; // nửa trái: lật để luôn đọc xuôi
                         const icon =
-                            display === "icon" && s.icon && !brokenIcons.has(s.icon)
+                            display !== "text" && s.icon && !brokenIcons.has(s.icon)
                                 ? resolveIcon(s.icon)
                                 : null;
+                        const showText = display !== "icon" || !icon;
+                        const both = display === "both";
+
+                        // Mép ngoài của chữ: sát rìa, hoặc lùi vào trong nếu có hình đứng ngoài.
+                        let textEdge = EDGE;
+                        let iconNode = null;
+                        let textX = null; // tâm chữ khi căn giữa cùng hình (chế độ "both")
 
                         if (icon) {
-                            return (
-                                <g key={s.id} transform={`rotate(${s.mid - 90} ${C} ${C})`}>
-                                    <SliceIcon
-                                        icon={icon}
-                                        x={C + ICON_CENTER}
-                                        size={iconSize(s.sweep)}
-                                        flip={flip}
-                                        clipId={`lw-clip-${s.id}`}
-                                        onError={() => markBroken(s.icon)}
-                                    />
-                                </g>
+                            // Ít ô: ô rộng nên cho hình to hơn và tính cỡ theo bán kính giữa dải.
+                            const maxIcon = both ? (centered ? 56 : 40) : centered ? 84 : 52;
+                            const size = fitIcon(
+                                s.sweep,
+                                maxIcon,
+                                centered ? (INNER + EDGE) / 2 : EDGE - 18
+                            );
+                            let iconX = C + EDGE - size / 2; // mặc định: sát rìa ngoài
+                            textEdge = EDGE - size - GAP;
+
+                            if (centered) {
+                                if (showText) {
+                                    // "both": đặt cả cụm [chữ + khoảng cách + hình] vào giữa dải.
+                                    const { fontSize, text } = fitText(
+                                        s.label,
+                                        s.sweep,
+                                        segments.length,
+                                        textEdge,
+                                        2
+                                    );
+                                    const w = Math.min(
+                                        textEdge - INNER,
+                                        text.length * fontSize * 0.55
+                                    );
+                                    const start = INNER + (EDGE - INNER - (w + GAP + size)) / 2;
+                                    textX = C + start + w / 2;
+                                    iconX = C + start + w + GAP + size / 2;
+                                } else {
+                                    // "icon": hình nằm giữa dải.
+                                    iconX = C + (INNER + EDGE) / 2;
+                                }
+                            }
+
+                            iconNode = (
+                                <SliceIcon
+                                    icon={icon}
+                                    cx={iconX}
+                                    size={size}
+                                    flip={flip}
+                                    clipId={`lw-clip-${s.id}`}
+                                    onError={() => markBroken(s.icon)}
+                                />
                             );
                         }
 
-                        const { fontSize, text } = layoutLabel(
-                            s.label,
-                            s.sweep,
-                            segments.length
-                        );
-                        const x = C + LABEL_CENTER;
-                        return (
-                            <g key={s.id} transform={`rotate(${s.mid - 90} ${C} ${C})`}>
+                        let textNode = null;
+                        if (showText) {
+                            const { fontSize, text } = fitText(
+                                s.label,
+                                s.sweep,
+                                segments.length,
+                                textEdge,
+                                icon ? 2 : 0
+                            );
+
+                            // Ít ô: đặt chữ ở giữa dải [INNER, textEdge], căn giữa theo chiều ngang.
+                            // Nhiều ô: dính mép ngoài - nửa phải chữ kết thúc tại mép,
+                            // nửa trái (lật 180°) chữ bắt đầu tại mép.
+                            const x =
+                                textX ?? C + (centered ? (INNER + textEdge) / 2 : textEdge);
+                            const anchor = centered ? "middle" : flip ? "start" : "end";
+
+                            textNode = (
                                 <text
                                     x={x}
                                     y={C}
                                     transform={flip ? `rotate(180 ${x} ${C})` : undefined}
-                                    textAnchor="middle"
+                                    textAnchor={anchor}
                                     dominantBaseline="central"
                                     fontSize={fontSize}
                                     fill="#fff"
@@ -194,6 +255,13 @@ export default function Wheel({
                                 >
                                     {text}
                                 </text>
+                            );
+                        }
+
+                        return (
+                            <g key={s.id} transform={`rotate(${s.mid - 90} ${C} ${C})`}>
+                                {textNode}
+                                {iconNode}
                             </g>
                         );
                     })}
