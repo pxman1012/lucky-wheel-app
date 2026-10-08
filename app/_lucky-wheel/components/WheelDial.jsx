@@ -1,6 +1,12 @@
 import styles from "./Wheel.module.css";
 
-export default function WheelDial({ segments, total, gradient, rotation, spinning }) {
+export default function WheelDial({
+    segments,
+    total,
+    gradient,
+    rotation,
+    spinning,
+}) {
     return (
         <div className={styles.wheelWrap}>
             <div className={styles.pointer} />

@@ -4,7 +4,14 @@ import styles from "./Wheel.module.css";
 import { buildConicGradient } from "../utils";
 import { PALETTE } from "../constants";
 
-export default function Wheel({ segments, total, rotation, spinning, onSpin, disabled }) {
+export default function Wheel({
+    segments,
+    total,
+    rotation,
+    spinning,
+    onSpin,
+    disabled,
+}) {
     const gradient = buildConicGradient(segments, total, PALETTE);
 
     return (
@@ -16,7 +23,11 @@ export default function Wheel({ segments, total, rotation, spinning, onSpin, dis
                 rotation={rotation}
                 spinning={spinning}
             />
-            <SpinButton onClick={onSpin} disabled={disabled} spinning={spinning} />
+            <SpinButton
+                onClick={onSpin}
+                disabled={disabled}
+                spinning={spinning}
+            />
         </div>
     );
 }

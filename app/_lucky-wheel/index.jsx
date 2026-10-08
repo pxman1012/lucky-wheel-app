@@ -51,7 +51,11 @@ export default function LuckyWheel() {
                 )}
             </div>
 
-            <ResultModal show={showResult} winner={winner} onClose={closeResult} />
+            <ResultModal
+                show={showResult}
+                winner={winner}
+                onClose={closeResult}
+            />
         </div>
     );
 }

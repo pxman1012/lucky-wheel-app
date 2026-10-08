@@ -1,0 +1,51 @@
+.history {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 28px;
+  font-size: 13px;
+}
+
+.label {
+  color: var(--text-muted);
+}
+
+.list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chip {
+  max-width: 160px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chip:first-child {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.clear {
+  border: none;
+  background: none;
+  padding: 2px 4px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.clear:hover {
+  color: var(--danger);
+}

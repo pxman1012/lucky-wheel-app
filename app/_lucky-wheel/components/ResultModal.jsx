@@ -9,7 +9,11 @@ export default function ResultModal({ show, winner, onClose }) {
                 <div className={styles.emoji}>🎉</div>
                 <div className={styles.kicker}>Hôm nay chọn</div>
                 <div className={styles.winner}>{winner.label}</div>
-                <button type="button" className={styles.closeBtn} onClick={onClose}>
+                <button
+                    type="button"
+                    className={styles.closeBtn}
+                    onClick={onClose}
+                >
                     Quay lại
                 </button>
             </div>

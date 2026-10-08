@@ -16,8 +16,14 @@ function readStoredOptions() {
         if (!Array.isArray(parsed) || parsed.length === 0) return null;
 
         const cleaned = parsed
-            .filter((o) => o && typeof o.label === "string" && Number.isFinite(o.qty))
-            .map((o) => ({ label: o.label, qty: Math.max(1, Math.min(99, o.qty)) }));
+            .filter(
+                (o) =>
+                    o && typeof o.label === "string" && Number.isFinite(o.qty),
+            )
+            .map((o) => ({
+                label: o.label,
+                qty: Math.max(1, Math.min(99, o.qty)),
+            }));
 
         return cleaned.length > 0 ? cleaned : null;
     } catch {
@@ -53,7 +59,10 @@ export function useOptions(defaultOptions) {
         const trimmed = label.trim();
         if (!trimmed) return;
         const safeQty = Math.max(1, Math.min(99, Number(qty) || 1));
-        setOptions((prev) => [...prev, { id: makeId(), label: trimmed, qty: safeQty }]);
+        setOptions((prev) => [
+            ...prev,
+            { id: makeId(), label: trimmed, qty: safeQty },
+        ]);
     };
 
     const removeOption = (id) => {
@@ -63,8 +72,10 @@ export function useOptions(defaultOptions) {
     const updateQty = (id, delta) => {
         setOptions((prev) =>
             prev.map((o) =>
-                o.id === id ? { ...o, qty: Math.max(1, Math.min(99, o.qty + delta)) } : o
-            )
+                o.id === id
+                    ? { ...o, qty: Math.max(1, Math.min(99, o.qty + delta)) }
+                    : o,
+            ),
         );
     };
 

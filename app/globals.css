@@ -1,5 +1,41 @@
-@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap");
+/* ---------- Design tokens ---------- */
+:root {
+  color-scheme: light;
+  --bg: #f5f6fb;
+  --bg-glow: #e4e7fb;
+  --surface: #ffffff;
+  --surface-2: #f1f2f9;
+  --border: #e2e4f0;
+  --text: #1b1d33;
+  --text-muted: #5b6085;
+  --accent: #4f46e5;
+  --accent-hover: #4338ca;
+  --accent-contrast: #ffffff;
+  --accent-soft: rgba(79, 70, 229, 0.1);
+  --danger: #dc3545;
+  --shadow: rgba(30, 35, 90, 0.16);
+  --radius: 16px;
+  --radius-sm: 12px;
+}
 
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #101223;
+  --bg-glow: #1c2050;
+  --surface: #181b33;
+  --surface-2: #20244a;
+  --border: #2c3160;
+  --text: #f3f4ff;
+  --text-muted: #a4a9d3;
+  --accent: #8b93ff;
+  --accent-hover: #a3a9ff;
+  --accent-contrast: #12142b;
+  --accent-soft: rgba(139, 147, 255, 0.14);
+  --danger: #ff7a85;
+  --shadow: rgba(0, 0, 0, 0.5);
+}
+
+/* ---------- Reset nhẹ ---------- */
 * {
   box-sizing: border-box;
 }
@@ -10,8 +46,40 @@ body {
   padding: 0;
 }
 
-button:focus-visible,
-input:focus-visible {
-  outline: 2px solid #ffb020;
+body {
+    min-height: 100vh;
+    overflow-x: clip;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans), system-ui, -apple-system, "Segoe UI", sans-serif;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+}
+
+button,
+input {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

@@ -24,7 +24,7 @@ export default function OptionsPanel({
     const handleClearAll = () => {
         if (options.length === 0) return;
         const ok = window.confirm(
-            "Xoá toàn bộ lựa chọn? Hành động này không thể hoàn tác."
+            "Xoá toàn bộ lựa chọn? Hành động này không thể hoàn tác.",
         );
         if (ok) onClearAll();
     };
@@ -57,7 +57,9 @@ export default function OptionsPanel({
                 <button
                     type="button"
                     className={styles.stepBtn}
-                    onClick={() => setQtyInput((q) => Math.max(1, Number(q) - 1))}
+                    onClick={() =>
+                        setQtyInput((q) => Math.max(1, Number(q) - 1))
+                    }
                     aria-label="Giảm trọng số"
                 >
                     −
@@ -66,7 +68,9 @@ export default function OptionsPanel({
                 <button
                     type="button"
                     className={styles.stepBtn}
-                    onClick={() => setQtyInput((q) => Math.min(99, Number(q) + 1))}
+                    onClick={() =>
+                        setQtyInput((q) => Math.min(99, Number(q) + 1))
+                    }
                     aria-label="Tăng trọng số"
                 >
                     +

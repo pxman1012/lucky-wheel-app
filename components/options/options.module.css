@@ -1,0 +1,333 @@
+/* ---------- Khung ---------- */
+.panel {
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: 0 12px 32px var(--shadow);
+  transition: opacity 0.2s;
+}
+
+.panel[data-locked="true"] {
+  opacity: 0.6;
+}
+
+.panelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.panelTitle {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.muted {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.hint {
+  margin: -6px 0 12px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* ---------- Công tắc "Nâng cao" ---------- */
+.switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-muted);
+  cursor: pointer;
+  user-select: none;
+}
+
+.switch input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.track {
+  position: relative;
+  width: 34px;
+  height: 20px;
+  border-radius: 999px;
+  background: var(--border);
+  transition: background 0.2s;
+}
+
+.track::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s;
+}
+
+.switch input:checked + .track {
+  background: var(--accent);
+}
+
+.switch input:checked + .track::after {
+  transform: translateX(14px);
+}
+
+.switch input:focus-visible + .track {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ---------- Form thêm ---------- */
+.form {
+  margin-bottom: 14px;
+}
+
+.addRow {
+  display: flex;
+  gap: 8px;
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  font-size: 15px;
+}
+
+.input::placeholder {
+  color: var(--text-muted);
+  opacity: 0.8;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.addBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--accent);
+  color: var(--accent-contrast);
+  transition: background 0.15s, opacity 0.15s;
+}
+
+.addBtn:hover:not(:disabled) {
+  background: var(--accent-hover);
+}
+
+.addBtn:disabled {
+  opacity: 0.4;
+}
+
+.weightRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+/* ---------- Bộ tăng giảm ---------- */
+.stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.stepBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface-2);
+  line-height: 1;
+}
+
+.stepBtn:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+.stepBtn:disabled {
+  opacity: 0.35;
+}
+
+.stepValue {
+  min-width: 22px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Danh sách ---------- */
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 340px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-y: auto;
+}
+
+.empty {
+  margin: 0;
+  padding: 20px 8px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 6px;
+  border-radius: 10px;
+}
+
+.item:hover,
+.item:focus-within {
+  background: var(--surface-2);
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  border-radius: 50%;
+}
+
+.name {
+  flex: 1;
+  min-width: 0;
+  height: 34px;
+  padding: 0 8px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  font-size: 15px;
+  text-overflow: ellipsis;
+}
+
+.name:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: var(--surface);
+}
+
+.percent {
+  min-width: 34px;
+  text-align: right;
+  font-size: 13px;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.removeBtn {
+  display: inline-flex;
+  flex-shrink: 0;
+  padding: 6px;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  color: var(--text-muted);
+}
+
+.removeBtn:hover {
+  color: var(--danger);
+}
+
+/* Máy có chuột: chỉ hiện nút xoá khi rê chuột / focus. Cảm ứng: luôn hiện. */
+@media (hover: hover) {
+  .removeBtn {
+    opacity: 0;
+  }
+
+  .item:hover .removeBtn,
+  .item:focus-within .removeBtn {
+    opacity: 1;
+  }
+}
+
+/* ---------- Chân panel ---------- */
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.clearBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  background: none;
+  padding: 4px 0;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.clearBtn:not(:disabled):hover {
+  color: var(--danger);
+}
+
+.clearBtn:disabled {
+  opacity: 0.4;
+}
+
+.presets {
+  margin-top: 14px;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.chip {
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: transparent;
+  font-size: 13px;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.chip:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
