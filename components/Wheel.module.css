@@ -9,6 +9,7 @@
   position: absolute;
   inset: 0;
   padding: 8px;
+  overflow: hidden;
   border-radius: 50%;
   background: var(--surface);
   box-shadow: 0 0 0 1px var(--border), 0 24px 60px var(--shadow);
