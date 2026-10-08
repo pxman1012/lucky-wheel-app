@@ -63,10 +63,22 @@ export function useDrafts() {
         setDrafts((prev) =>
             existing ? prev.map((d) => (d.id === existing.id ? entry : d)) : [entry, ...prev]
         );
+        return { ok: true, id: entry.id };
+    };
+
+    /** Đổi tên một mẫu đã lưu. Trả về { ok: true } hoặc { ok: false, error } */
+    const renameDraft = (id, name) => {
+        const clean = cleanName(name);
+        if (!clean) return { ok: false, error: "Hãy nhập tên mẫu." };
+        const taken = drafts.some((d) => d.id !== id && d.name.toLowerCase() === clean.toLowerCase());
+        if (taken) return { ok: false, error: "Đã có mẫu trùng tên này." };
+        setDrafts((prev) =>
+            prev.map((d) => (d.id === id ? { ...d, name: clean, updatedAt: Date.now() } : d))
+        );
         return { ok: true };
     };
 
     const removeDraft = (id) => setDrafts((prev) => prev.filter((d) => d.id !== id));
 
-    return { drafts, saveDraft, removeDraft };
+    return { drafts, saveDraft, renameDraft, removeDraft };
 }

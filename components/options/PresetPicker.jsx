@@ -14,6 +14,7 @@ export default function PresetPicker({
     onApplyDraft,
     onSaveDraft,
     onRemoveDraft,
+    activeName,
 }) {
     const [tab, setTab] = useState("builtin"); // "builtin" | "mine"
     const [saving, setSaving] = useState(false);
@@ -183,7 +184,10 @@ export default function PresetPicker({
                             <button
                                 type="button"
                                 className={styles.primaryLink}
-                                onClick={() => setSaving(true)}
+                                onClick={() => {
+                                    setName(activeName ?? "");
+                                    setSaving(true);
+                                }}
                                 disabled={segments.length === 0 || isFull}
                             >
                                 + Lưu danh sách hiện tại

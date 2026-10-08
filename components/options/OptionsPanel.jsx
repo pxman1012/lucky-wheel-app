@@ -22,6 +22,7 @@ export default function OptionsPanel({
     onSaveDraft,
     onRemoveDraft,
     locked,
+    activeName
 }) {
     return (
         <section
@@ -80,6 +81,7 @@ export default function OptionsPanel({
                 onApplyDraft={onApplyDraft}
                 onSaveDraft={onSaveDraft}
                 onRemoveDraft={onRemoveDraft}
+                activeName={activeName}
             />
         </section>
     );

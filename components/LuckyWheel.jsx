@@ -14,6 +14,7 @@ import Header from "./Header";
 import History from "./History";
 import ResultModal from "./ResultModal";
 import Toast from "./Toast";
+import WheelTitle from "./WheelTitle";
 import Wheel from "./Wheel";
 import OptionsPanel from "./options/OptionsPanel";
 import styles from "./LuckyWheel.module.css";
@@ -23,6 +24,16 @@ const parseHistory = (v) =>
 
 const parseBoolean = (v) => (typeof v === "boolean" ? v : undefined);
 
+/** Vòng quay đang dùng: { kind: "preset", name } | { kind: "draft", id } | null */
+const parseActive = (v) => {
+    if (v === null) return null;
+    if (v?.kind === "preset" && typeof v.name === "string" && v.name) {
+        return { kind: "preset", name: v.name };
+    }
+    if (v?.kind === "draft" && typeof v.id === "string") return { kind: "draft", id: v.id };
+    return undefined;
+};
+
 const parseDisplay = (v) => (v === "text" || v === "icon" || v === "both" ? v : undefined);
 
 export default function LuckyWheel() {
@@ -30,16 +41,20 @@ export default function LuckyWheel() {
         options,
         isLoaded,
         addOptions,
-        removeOption,
+        removeOption: removeOptionRaw,
         renameOption,
         setWeight,
-        clearAll,
-        replaceAll,
+        clearAll: clearAllRaw,
+        replaceAll: replaceAllRaw,
         undoState,
-        undo,
+        undo: undoRaw,
         dismissUndo,
     } = useOptions();
-    const { drafts, saveDraft, removeDraft } = useDrafts();
+    const { drafts, saveDraft, renameDraft, removeDraft } = useDrafts();
+
+    // Vòng quay đang dùng (mẫu có sẵn / mẫu đã lưu) để hiện tên phía trên vòng quay.
+    const [active, setActive] = useLocalStorage(STORAGE_KEYS.active, null, { parse: parseActive });
+    const prevActiveRef = useRef(null);
 
     const [advanced, setAdvanced] = useLocalStorage(STORAGE_KEYS.advanced, false, {
         parse: parseBoolean,
@@ -51,6 +66,33 @@ export default function LuckyWheel() {
         parse: parseDisplay,
     });
     const [resultOpen, setResultOpen] = useState(false);
+
+    const activeDraft = active?.kind === "draft" ? drafts.find((d) => d.id === active.id) : null;
+    const wheelName = active?.kind === "preset" ? active.name : (activeDraft?.name ?? null);
+    const wheelKind = wheelName ? active.kind : null;
+
+    // Ghi nhớ tên hiện tại trước các thao tác có thể hoàn tác, để hoàn tác cũng trả lại tên.
+    const keepActive = () => {
+        prevActiveRef.current = active;
+    };
+    const removeOption = (id) => {
+        keepActive();
+        removeOptionRaw(id);
+    };
+    const clearAll = () => {
+        keepActive();
+        clearAllRaw();
+        setActive(null);
+    };
+    const replaceAll = (list, message, nextActive = null) => {
+        keepActive();
+        replaceAllRaw(list, message);
+        if (list.length > 0) setActive(nextActive);
+    };
+    const undo = () => {
+        undoRaw();
+        setActive(prevActiveRef.current);
+    };
 
     const { segments, total } = useMemo(() => computeSegments(options), [options]);
     const { muted, toggleMuted, unlock, tick, win } = useSound();
@@ -77,7 +119,10 @@ export default function LuckyWheel() {
             : PRESETS.find((item) => item.id === p);
 
         if (preset) {
-            replaceAll(preset.options, `Đã mở mẫu "${preset.label}"`);
+            replaceAll(preset.options, `Đã mở mẫu "${preset.label}"`, {
+                kind: "preset",
+                name: preset.label,
+            });
         } else if (d) {
             const list = decodeShare(d);
             if (list?.length) replaceAll(list, "Đã mở danh sách được chia sẻ");
@@ -131,11 +176,31 @@ export default function LuckyWheel() {
     };
 
     /* ---------- Mẫu ---------- */
-    const applyPreset = (preset) => replaceAll(preset.options, `Đã áp dụng mẫu "${preset.label}"`);
+    const applyPreset = (preset) =>
+        replaceAll(preset.options, `Đã áp dụng mẫu "${preset.label}"`, {
+            kind: "preset",
+            name: preset.label,
+        });
 
-    const applyDraft = (draft) => replaceAll(draft.options, `Đã mở mẫu "${draft.name}"`);
+    const applyDraft = (draft) =>
+        replaceAll(draft.options, `Đã mở mẫu "${draft.name}"`, { kind: "draft", id: draft.id });
 
-    const saveCurrentAsDraft = (name) => saveDraft(name, options);
+    const saveCurrentAsDraft = (name) => {
+        const result = saveDraft(name, options);
+        if (result.ok) setActive({ kind: "draft", id: result.id });
+        return result;
+    };
+
+    /** Đặt tên cho vòng quay chưa có tên = lưu vào "Của tôi" với tên đó. */
+    const nameCurrentWheel = (name) => {
+        const clean = String(name ?? "").trim().toLowerCase();
+        if (clean && drafts.some((d) => d.name.toLowerCase() === clean)) {
+            return { ok: false, error: "Đã có mẫu trùng tên, hãy chọn tên khác." };
+        }
+        return saveCurrentAsDraft(name);
+    };
+
+    const renameWheel = (name) => (activeDraft ? renameDraft(activeDraft.id, name) : { ok: false });
 
     return (
         <div className={styles.page}>
@@ -149,6 +214,14 @@ export default function LuckyWheel() {
                 ) : (
                     <main className={styles.main}>
                         <section className={styles.stage} aria-label="Vòng quay">
+                            <WheelTitle
+                                name={wheelName}
+                                kind={wheelKind}
+                                canSave={segments.length > 0}
+                                onSave={nameCurrentWheel}
+                                onRename={renameWheel}
+                                locked={spinning}
+                            />
                             <Wheel
                                 segments={segments}
                                 total={total}
@@ -181,6 +254,7 @@ export default function LuckyWheel() {
                             onSaveDraft={saveCurrentAsDraft}
                             onRemoveDraft={removeDraft}
                             locked={spinning}
+                            activeName={wheelName}
                         />
                     </main>
                 )}
