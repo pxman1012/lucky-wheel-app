@@ -1,11 +1,16 @@
+"use client";
+
+import { useState } from "react";
+import { resolveIcon } from "@/lib/icons";
 import { truncate, slicePath } from "@/lib/wheel";
 import styles from "./Wheel.module.css";
 
 const SIZE = 400;
 const C = SIZE / 2; // tâm
 const R = SIZE / 2; // bán kính
-const LABEL_CENTER = 124; // khoảng cách từ tâm tới giữa nhãn
-const LABEL_LENGTH = 122; // chiều dài tối đa của nhãn
+const LABEL_CENTER = 124; // khoảng cách từ tâm tới giữa nhãn chữ
+const LABEL_LENGTH = 122; // chiều dài tối đa của nhãn chữ
+const ICON_CENTER = 140; // khoảng cách từ tâm tới giữa icon
 
 function layoutLabel(label, sweep, count) {
     const base = count <= 6 ? 22 : count <= 10 ? 18 : 15;
@@ -15,13 +20,71 @@ function layoutLabel(label, sweep, count) {
     return { fontSize, text: truncate(label, maxChars) };
 }
 
+function iconSize(sweep) {
+    const arc = (2 * Math.PI * ICON_CENTER * sweep) / 360;
+    return Math.max(16, Math.min(52, arc * 0.72));
+}
+
+/** Icon trong một ô: emoji, cờ (cắt tròn) hoặc logo (nền trắng). */
+function SliceIcon({ icon, x, size, flip, clipId, onError }) {
+    const half = size / 2;
+    const rotate = flip ? `rotate(180 ${x} ${C})` : undefined;
+
+    if (icon.type === "emoji") {
+        return (
+            <text
+                x={x}
+                y={C}
+                transform={rotate}
+                textAnchor="middle"
+                dominantBaseline="central"
+                fontSize={size * 0.85}
+            >
+                {icon.text}
+            </text>
+        );
+    }
+
+    const isFlag = icon.type === "flag";
+    const box = isFlag ? size : size * 0.78;
+    return (
+        <g transform={rotate}>
+            <clipPath id={clipId}>
+                <circle cx={x} cy={C} r={half} />
+            </clipPath>
+            <circle cx={x} cy={C} r={half + 2} fill="#fff" />
+            <image
+                href={icon.src}
+                x={x - box / 2}
+                y={C - box / 2}
+                width={box}
+                height={box}
+                preserveAspectRatio={isFlag ? "xMidYMid slice" : "xMidYMid meet"}
+                clipPath={isFlag ? `url(#${clipId})` : undefined}
+                onError={onError}
+            />
+        </g>
+    );
+}
+
 /**
  * Vòng quay dạng SVG. `dialRef` trỏ vào <svg> để useSpin ghi góc quay trực tiếp.
- * Bấm vào vòng hoặc nút ở tâm đều quay.
+ * `display`: "text" hiện chữ, "icon" hiện hình (mục không có hình hoặc hình lỗi thì hiện chữ).
  */
-export default function Wheel({ segments, total, spinning, onSpin, dialRef, pointerRef }) {
+export default function Wheel({
+    segments,
+    total,
+    spinning,
+    onSpin,
+    dialRef,
+    pointerRef,
+    display = "text",
+}) {
+    const [brokenIcons, setBrokenIcons] = useState(() => new Set());
     const canSpin = total > 0 && !spinning;
     const only = segments.length === 1 ? segments[0] : null;
+
+    const markBroken = (icon) => setBrokenIcons((prev) => new Set(prev).add(icon));
 
     return (
         <div className={styles.wrap}>
@@ -82,13 +145,33 @@ export default function Wheel({ segments, total, spinning, onSpin, dialRef, poin
                     )}
 
                     {segments.map((s) => {
+                        const flip = s.mid > 180; // nửa trái: lật để luôn đọc xuôi
+                        const icon =
+                            display === "icon" && s.icon && !brokenIcons.has(s.icon)
+                                ? resolveIcon(s.icon)
+                                : null;
+
+                        if (icon) {
+                            return (
+                                <g key={s.id} transform={`rotate(${s.mid - 90} ${C} ${C})`}>
+                                    <SliceIcon
+                                        icon={icon}
+                                        x={C + ICON_CENTER}
+                                        size={iconSize(s.sweep)}
+                                        flip={flip}
+                                        clipId={`lw-clip-${s.id}`}
+                                        onError={() => markBroken(s.icon)}
+                                    />
+                                </g>
+                            );
+                        }
+
                         const { fontSize, text } = layoutLabel(
                             s.label,
                             s.sweep,
                             segments.length
                         );
                         const x = C + LABEL_CENTER;
-                        const flip = s.mid > 180; // nửa trái: lật chữ để luôn đọc xuôi
                         return (
                             <g key={s.id} transform={`rotate(${s.mid - 90} ${C} ${C})`}>
                                 <text
@@ -104,7 +187,8 @@ export default function Wheel({ segments, total, spinning, onSpin, dialRef, poin
                                     paintOrder="stroke"
                                     strokeLinejoin="round"
                                     style={{
-                                        fontFamily: "var(--font-display), var(--font-sans), sans-serif",
+                                        fontFamily:
+                                            "var(--font-display), var(--font-sans), sans-serif",
                                         fontWeight: 700,
                                     }}
                                 >

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { MAX_LABEL_LENGTH } from "@/lib/constants";
 import { CloseIcon } from "../Icons";
+import OptionIcon from "../OptionIcon";
 import WeightStepper from "./WeightStepper";
 import styles from "./options.module.css";
 
@@ -16,10 +17,9 @@ function OptionItem({ segment, advanced, onRename, onWeight, onRemove }) {
 
     return (
         <li className={styles.item}>
-            <span
-                className={styles.dot}
-                style={{ background: segment.color }}
-            />
+            <span className={styles.dot} style={{ background: segment.color }} />
+
+            {segment.icon && <OptionIcon key={segment.icon} icon={segment.icon} size={22} />}
 
             <input
                 className={styles.name}
@@ -60,18 +60,11 @@ function OptionItem({ segment, advanced, onRename, onWeight, onRemove }) {
     );
 }
 
-export default function OptionList({
-    segments,
-    advanced,
-    onRename,
-    onWeight,
-    onRemove,
-}) {
+export default function OptionList({ segments, advanced, onRename, onWeight, onRemove }) {
     if (segments.length === 0) {
         return (
             <p className={styles.empty}>
-                Chưa có lựa chọn nào. Hãy thêm vài mục hoặc chọn một mẫu bên
-                dưới.
+                Chưa có lựa chọn nào. Hãy thêm vài mục hoặc chọn một mẫu bên dưới.
             </p>
         );
     }

@@ -9,6 +9,7 @@ import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { useOptions } from "@/hooks/useOptions";
 import { useSound } from "@/hooks/useSound";
 import { useSpin } from "@/hooks/useSpin";
+import DisplayToggle from "./DisplayToggle";
 import Header from "./Header";
 import History from "./History";
 import ResultModal from "./ResultModal";
@@ -21,6 +22,8 @@ const parseHistory = (v) =>
     Array.isArray(v) ? v.filter((x) => typeof x === "string").slice(0, HISTORY_LIMIT) : undefined;
 
 const parseBoolean = (v) => (typeof v === "boolean" ? v : undefined);
+
+const parseDisplay = (v) => (v === "text" || v === "icon" ? v : undefined);
 
 export default function LuckyWheel() {
     const {
@@ -44,10 +47,17 @@ export default function LuckyWheel() {
     const [history, setHistory] = useLocalStorage(STORAGE_KEYS.history, [], {
         parse: parseHistory,
     });
+    const [displayMode, setDisplayMode] = useLocalStorage(STORAGE_KEYS.display, "text", {
+        parse: parseDisplay,
+    });
     const [resultOpen, setResultOpen] = useState(false);
 
     const { segments, total } = useMemo(() => computeSegments(options), [options]);
     const { muted, toggleMuted, unlock, tick, win } = useSound();
+
+    // Chỉ hiện hình khi có ít nhất một mục có hình.
+    const hasIcons = options.some((o) => o.icon);
+    const display = displayMode === "icon" && hasIcons ? "icon" : "text";
 
     const dialRef = useRef(null);
     const pointerRef = useRef(null);
@@ -67,10 +77,7 @@ export default function LuckyWheel() {
             : PRESETS.find((item) => item.id === p);
 
         if (preset) {
-            replaceAll(
-                preset.options.map((label) => ({ label })),
-                `Đã mở mẫu "${preset.label}"`
-            );
+            replaceAll(preset.options, `Đã mở mẫu "${preset.label}"`);
         } else if (d) {
             const list = decodeShare(d);
             if (list?.length) replaceAll(list, "Đã mở danh sách được chia sẻ");
@@ -124,11 +131,7 @@ export default function LuckyWheel() {
     };
 
     /* ---------- Mẫu ---------- */
-    const applyPreset = (preset) =>
-        replaceAll(
-            preset.options.map((label) => ({ label })),
-            `Đã áp dụng mẫu "${preset.label}"`
-        );
+    const applyPreset = (preset) => replaceAll(preset.options, `Đã áp dụng mẫu "${preset.label}"`);
 
     const applyDraft = (draft) => replaceAll(draft.options, `Đã mở mẫu "${draft.name}"`);
 
@@ -153,6 +156,12 @@ export default function LuckyWheel() {
                                 onSpin={startSpin}
                                 dialRef={dialRef}
                                 pointerRef={pointerRef}
+                                display={display}
+                            />
+                            <DisplayToggle
+                                value={display}
+                                onChange={setDisplayMode}
+                                hasIcons={hasIcons}
                             />
                             <History items={history} onClear={() => setHistory([])} />
                         </section>

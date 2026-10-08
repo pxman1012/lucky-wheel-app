@@ -42,7 +42,7 @@ export default function PresetPicker({
         }
     };
 
-    const toShareOptions = (list) => list.map((o) => ({ label: o.label, weight: o.weight ?? 1 }));
+    const toShareOptions = (list) => list.map((o) => ({ label: o.label, weight: o.weight ?? 1, icon: o.icon }));
 
     const submitSave = (e) => {
         e.preventDefault();

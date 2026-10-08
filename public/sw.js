@@ -1,7 +1,7 @@
 // Service worker: giúp app mở được khi mất mạng.
 // - Trang (navigate): ưu tiên mạng, mất mạng thì dùng bản đã lưu.
 // - Tài nguyên tĩnh (/_next/static, /icons): ưu tiên cache vì file có hash, không đổi.
-const CACHE_NAME = "lucky-wheel-v2";
+const CACHE_NAME = "lucky-wheel-v3";
 const PRECACHE_URLS = ["/", "/icons/icon-192.png"];
 
 self.addEventListener("install", (event) => {
@@ -56,7 +56,8 @@ self.addEventListener("fetch", (event) => {
 
     if (
         url.pathname.startsWith("/_next/static/") ||
-        url.pathname.startsWith("/icons/")
+        url.pathname.startsWith("/icons/") ||
+        url.pathname.startsWith("/logos/")
     ) {
         event.respondWith(
             caches.match(request).then(

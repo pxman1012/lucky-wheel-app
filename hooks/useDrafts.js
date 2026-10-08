@@ -1,10 +1,22 @@
 "use client";
 
 import { MAX_DRAFT_NAME, MAX_DRAFTS, STORAGE_KEYS } from "@/lib/constants";
+import { sanitizeIcon } from "@/lib/icons";
 import { clampWeight, cleanLabel, makeId } from "@/lib/options";
 import { useLocalStorage } from "./useLocalStorage";
 
-const cleanName = (value) => String(value ?? "").replace(/\s+/g, " ").trim().slice(0, MAX_DRAFT_NAME);
+const cleanName = (value) =>
+    String(value ?? "")
+        .replace(/\s+/g, " ")
+        .trim()
+        .slice(0, MAX_DRAFT_NAME);
+
+const toStoredOption = ({ label, weight, icon }) => {
+    const item = { label: cleanLabel(label), weight: clampWeight(weight) };
+    const safeIcon = sanitizeIcon(icon);
+    if (safeIcon) item.icon = safeIcon;
+    return item;
+};
 
 /** Đọc và chuẩn hoá dữ liệu đã lưu; trả về undefined nếu hỏng. */
 function parseDrafts(raw) {
@@ -16,7 +28,7 @@ function parseDrafts(raw) {
             name: cleanName(d.name),
             options: d.options
                 .filter((o) => o && typeof o.label === "string")
-                .map((o) => ({ label: cleanLabel(o.label), weight: clampWeight(o.weight) }))
+                .map(toStoredOption)
                 .filter((o) => o.label),
             updatedAt: Number(d.updatedAt) || 0,
         }))
@@ -45,7 +57,7 @@ export function useDrafts() {
         const entry = {
             id: existing?.id ?? makeId(),
             name: clean,
-            options: options.map(({ label, weight }) => ({ label, weight })),
+            options: options.map(toStoredOption),
             updatedAt: Date.now(),
         };
         setDrafts((prev) =>

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { DEFAULT_OPTIONS, MAX_OPTIONS, STORAGE_KEYS } from "@/lib/constants";
+import { splitIcon } from "@/lib/icons";
 import {
     clampWeight,
     cleanLabel,
@@ -30,12 +31,20 @@ export function useOptions() {
 
     const remember = (message) => setUndoState({ id: Date.now(), message, snapshot: options });
 
-    /** Thêm một hoặc nhiều lựa chọn. Trả về true nếu có thêm được. */
+    /**
+     * Thêm một hoặc nhiều lựa chọn. Emoji ở đầu tên sẽ thành icon ("🍕 Pizza").
+     * Trả về true nếu có thêm được.
+     */
     const addOptions = (labels, weight = 1) => {
-        const list = (Array.isArray(labels) ? labels : [labels]).map(cleanLabel).filter(Boolean);
+        const list = (Array.isArray(labels) ? labels : [labels])
+            .map(splitIcon)
+            .map(({ label, icon }) => ({ label: cleanLabel(label), icon }))
+            .filter((item) => item.label);
         const room = MAX_OPTIONS - options.length;
         if (list.length === 0 || room <= 0) return false;
-        const created = list.slice(0, room).map((label) => createOption(label, weight));
+        const created = list
+            .slice(0, room)
+            .map(({ label, icon }) => createOption(label, weight, icon));
         setOptions((prev) => [...prev, ...created]);
         return true;
     };
@@ -68,7 +77,7 @@ export function useOptions() {
     /** Thay toàn bộ danh sách (mẫu có sẵn, mẫu của tôi, link chia sẻ). Có thể hoàn tác. */
     const replaceAll = (list, message) => {
         const next = list
-            .map((o) => createOption(o.label, o.weight ?? 1))
+            .map((o) => createOption(o.label, o.weight ?? 1, o.icon))
             .filter((o) => o.label)
             .slice(0, MAX_OPTIONS);
         if (next.length === 0) return;

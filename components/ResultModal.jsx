@@ -3,14 +3,10 @@
 import { useEffect, useRef } from "react";
 import Confetti from "./Confetti";
 import { CloseIcon } from "./Icons";
+import OptionIcon from "./OptionIcon";
 import styles from "./ResultModal.module.css";
 
-export default function ResultModal({
-    winner,
-    onClose,
-    onSpinAgain,
-    onRemove,
-}) {
+export default function ResultModal({ winner, onClose, onSpinAgain, onRemove }) {
     const primaryRef = useRef(null);
 
     useEffect(() => {
@@ -34,14 +30,15 @@ export default function ResultModal({
                 aria-label="Kết quả"
                 onClick={(e) => e.stopPropagation()}
             >
-                <button
-                    type="button"
-                    className={styles.close}
-                    onClick={onClose}
-                    aria-label="Đóng"
-                >
+                <button type="button" className={styles.close} onClick={onClose} aria-label="Đóng">
                     <CloseIcon />
                 </button>
+
+                {winner.icon && (
+                    <div className={styles.icon}>
+                        <OptionIcon key={winner.icon} icon={winner.icon} size={72} glow />
+                    </div>
+                )}
 
                 <p className={styles.kicker}>Kết quả</p>
                 <p className={styles.winner}>{winner.label}</p>
@@ -55,11 +52,7 @@ export default function ResultModal({
                     >
                         Quay tiếp
                     </button>
-                    <button
-                        type="button"
-                        className={styles.secondary}
-                        onClick={onRemove}
-                    >
+                    <button type="button" className={styles.secondary} onClick={onRemove}>
                         Loại bỏ mục này
                     </button>
                 </div>

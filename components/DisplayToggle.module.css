@@ -1,0 +1,38 @@
+.wrap {
+    display: flex;
+    justify-content: center;
+    margin-top: 28px;
+}
+
+.toggle {
+    display: inline-flex;
+    gap: 4px;
+    padding: 3px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface);
+}
+
+.option {
+    padding: 6px 16px;
+    border: none;
+    border-radius: 999px;
+    background: transparent;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    transition: background 0.15s, color 0.15s;
+}
+
+.option[aria-checked="true"] {
+    background: var(--accent);
+    color: var(--accent-contrast);
+}
+
+.option:hover:not(:disabled):not([aria-checked="true"]) {
+    color: var(--text);
+}
+
+.option:disabled {
+    opacity: 0.45;
+}
