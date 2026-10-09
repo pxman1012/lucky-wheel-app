@@ -331,3 +331,51 @@
   border-color: var(--accent);
   background: var(--accent-soft);
 }
+
+/* ---------- Ảnh cho lựa chọn ---------- */
+.imgBtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface-2);
+    color: var(--text-muted);
+    transition: border-color 0.15s, color 0.15s;
+}
+
+.imgBtn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.iconBtn {
+    display: inline-flex;
+    flex-shrink: 0;
+    padding: 0;
+    border: none;
+    background: none;
+}
+
+.addImg {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border: 1px dashed var(--text-muted);
+    border-radius: 50%;
+    color: var(--text-muted);
+    opacity: 0.6;
+    transition: opacity 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.iconBtn:hover .addImg {
+    opacity: 1;
+    border-color: var(--accent);
+    color: var(--accent);
+}

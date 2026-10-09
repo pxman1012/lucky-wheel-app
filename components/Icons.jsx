@@ -60,3 +60,11 @@ export const TrashIcon = (p) => (
         <path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 11v6M14 11v6" />
     </svg>
 );
+
+export const ImageIcon = (p) => (
+    <svg {...base} {...p}>
+        <rect x="3" y="3" width="18" height="18" rx="3" />
+        <circle cx="9" cy="9" r="1.8" />
+        <path d="m21 15-5-5L5 21" />
+    </svg>
+);

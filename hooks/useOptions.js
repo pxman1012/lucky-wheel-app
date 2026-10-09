@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { DEFAULT_OPTIONS, MAX_OPTIONS, STORAGE_KEYS } from "@/lib/constants";
-import { splitIcon } from "@/lib/icons";
+import { sanitizeIcon, splitIcon } from "@/lib/icons";
 import {
     clampWeight,
     cleanLabel,
@@ -35,10 +35,11 @@ export function useOptions() {
      * Thêm một hoặc nhiều lựa chọn. Emoji ở đầu tên sẽ thành icon ("🍕 Pizza").
      * Trả về true nếu có thêm được.
      */
-    const addOptions = (labels, weight = 1) => {
+    const addOptions = (labels, weight = 1, icon) => {
+        const uploaded = sanitizeIcon(icon, true); // ảnh người dùng vừa chọn (nếu có)
         const list = (Array.isArray(labels) ? labels : [labels])
             .map(splitIcon)
-            .map(({ label, icon }) => ({ label: cleanLabel(label), icon }))
+            .map(({ label, icon: emoji }) => ({ label: cleanLabel(label), icon: uploaded ?? emoji }))
             .filter((item) => item.label);
         const room = MAX_OPTIONS - options.length;
         if (list.length === 0 || room <= 0) return false;
@@ -65,6 +66,18 @@ export function useOptions() {
     const setWeight = (id, weight) => {
         setOptions((prev) =>
             prev.map((o) => (o.id === id ? { ...o, weight: clampWeight(weight) } : o))
+        );
+    };
+
+    /** Đặt / đổi / xoá ảnh của một lựa chọn (icon rỗng = xoá). */
+    const setIcon = (id, icon) => {
+        const safe = sanitizeIcon(icon, true);
+        setOptions((prev) =>
+            prev.map((o) => {
+                if (o.id !== id) return o;
+                const { icon: _old, ...rest } = o;
+                return safe ? { ...rest, icon: safe } : rest;
+            })
         );
     };
 
@@ -100,6 +113,7 @@ export function useOptions() {
         removeOption,
         renameOption,
         setWeight,
+        setIcon,
         clearAll,
         replaceAll,
         undoState,

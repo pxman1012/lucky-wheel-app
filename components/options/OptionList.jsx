@@ -2,13 +2,15 @@
 
 import { useState } from "react";
 import { MAX_LABEL_LENGTH } from "@/lib/constants";
-import { CloseIcon } from "../Icons";
+import ImageEditor from "../ImageEditor";
+import { CloseIcon, PlusIcon } from "../Icons";
 import OptionIcon from "../OptionIcon";
 import WeightStepper from "./WeightStepper";
 import styles from "./options.module.css";
 
-function OptionItem({ segment, advanced, onRename, onWeight, onRemove }) {
-    const [draft, setDraft] = useState(null); // null = không đang sửa
+function OptionItem({ segment, advanced, onRename, onWeight, onIcon, onRemove }) {
+    const [draft, setDraft] = useState(null); // null = không đang sửa tên
+    const [editingImage, setEditingImage] = useState(false);
 
     const commit = () => {
         if (draft !== null && draft.trim()) onRename(segment.id, draft);
@@ -19,7 +21,21 @@ function OptionItem({ segment, advanced, onRename, onWeight, onRemove }) {
         <li className={styles.item}>
             <span className={styles.dot} style={{ background: segment.color }} />
 
-            {segment.icon && <OptionIcon key={segment.icon} icon={segment.icon} size={22} />}
+            <button
+                type="button"
+                className={styles.iconBtn}
+                onClick={() => setEditingImage(true)}
+                aria-label={segment.icon ? `Sửa ảnh của ${segment.label}` : `Thêm ảnh cho ${segment.label}`}
+                title={segment.icon ? "Sửa ảnh" : "Thêm ảnh"}
+            >
+                {segment.icon ? (
+                    <OptionIcon key={segment.icon} icon={segment.icon} size={22} />
+                ) : (
+                    <span className={styles.addImg}>
+                        <PlusIcon width={12} height={12} />
+                    </span>
+                )}
+            </button>
 
             <input
                 className={styles.name}
@@ -56,11 +72,30 @@ function OptionItem({ segment, advanced, onRename, onWeight, onRemove }) {
             >
                 <CloseIcon width={16} height={16} />
             </button>
+
+            {editingImage && (
+                <ImageEditor
+                    icon={segment.icon}
+                    onSave={(next) => {
+                        onIcon(segment.id, next);
+                        setEditingImage(false);
+                    }}
+                    onRemove={
+                        segment.icon
+                            ? () => {
+                                  onIcon(segment.id, undefined);
+                                  setEditingImage(false);
+                              }
+                            : undefined
+                    }
+                    onClose={() => setEditingImage(false)}
+                />
+            )}
         </li>
     );
 }
 
-export default function OptionList({ segments, advanced, onRename, onWeight, onRemove }) {
+export default function OptionList({ segments, advanced, onRename, onWeight, onIcon, onRemove }) {
     if (segments.length === 0) {
         return (
             <p className={styles.empty}>
@@ -78,6 +113,7 @@ export default function OptionList({ segments, advanced, onRename, onWeight, onR
                     advanced={advanced}
                     onRename={onRename}
                     onWeight={onWeight}
+                    onIcon={onIcon}
                     onRemove={onRemove}
                 />
             ))}

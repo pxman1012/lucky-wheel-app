@@ -2,21 +2,29 @@
 
 import { useRef, useState } from "react";
 import { MAX_LABEL_LENGTH } from "@/lib/constants";
-import { PlusIcon } from "../Icons";
+import ImageEditor from "../ImageEditor";
+import { ImageIcon, PlusIcon } from "../Icons";
+import OptionIcon from "../OptionIcon";
 import WeightStepper from "./WeightStepper";
 import styles from "./options.module.css";
 
-/** Ô nhập + nút "+" trên một dòng. Enter để thêm; dán nhiều dòng sẽ thêm nhiều mục. */
+/**
+ * Nút ảnh + ô nhập + nút "+" trên một dòng. Enter để thêm; dán nhiều dòng sẽ thêm nhiều mục.
+ * Ảnh là tuỳ chọn: bấm nút ảnh để chọn / chỉnh, bấm lại để sửa hoặc xoá.
+ */
 export default function OptionForm({ advanced, onAdd }) {
     const [label, setLabel] = useState("");
     const [weight, setWeight] = useState(1);
+    const [icon, setIcon] = useState(undefined);
+    const [editing, setEditing] = useState(false);
     const inputRef = useRef(null);
 
     const submit = (e) => {
         e.preventDefault();
-        if (onAdd(label, weight)) {
+        if (onAdd(label, weight, icon)) {
             setLabel("");
             setWeight(1);
+            setIcon(undefined);
         }
         inputRef.current?.focus();
     };
@@ -31,6 +39,15 @@ export default function OptionForm({ advanced, onAdd }) {
     return (
         <form className={styles.form} onSubmit={submit}>
             <div className={styles.addRow}>
+                <button
+                    type="button"
+                    className={styles.imgBtn}
+                    onClick={() => setEditing(true)}
+                    aria-label={icon ? "Sửa ảnh" : "Thêm ảnh (không bắt buộc)"}
+                    title={icon ? "Sửa ảnh" : "Thêm ảnh (không bắt buộc)"}
+                >
+                    {icon ? <OptionIcon key={icon} icon={icon} size={30} /> : <ImageIcon />}
+                </button>
                 <input
                     ref={inputRef}
                     className={styles.input}
@@ -57,6 +74,25 @@ export default function OptionForm({ advanced, onAdd }) {
                     <span className={styles.muted}>Trọng số cho mục mới</span>
                     <WeightStepper value={weight} onChange={setWeight} />
                 </div>
+            )}
+
+            {editing && (
+                <ImageEditor
+                    icon={icon}
+                    onSave={(next) => {
+                        setIcon(next);
+                        setEditing(false);
+                    }}
+                    onRemove={
+                        icon
+                            ? () => {
+                                  setIcon(undefined);
+                                  setEditing(false);
+                              }
+                            : undefined
+                    }
+                    onClose={() => setEditing(false)}
+                />
             )}
         </form>
     );

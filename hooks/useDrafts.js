@@ -13,7 +13,7 @@ const cleanName = (value) =>
 
 const toStoredOption = ({ label, weight, icon }) => {
     const item = { label: cleanLabel(label), weight: clampWeight(weight) };
-    const safeIcon = sanitizeIcon(icon);
+    const safeIcon = sanitizeIcon(icon, true);
     if (safeIcon) item.icon = safeIcon;
     return item;
 };

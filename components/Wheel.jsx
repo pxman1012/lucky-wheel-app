@@ -30,7 +30,7 @@ function fitIcon(sweep, max, radius = EDGE - 18) {
     return Math.max(16, Math.min(max, arc * 0.72));
 }
 
-/** Icon trong một ô, tâm tại (cx, C): emoji, cờ (cắt tròn) hoặc logo (nền trắng). */
+/** Icon trong một ô, tâm tại (cx, C): emoji, hoặc ảnh (cờ, món ăn, ảnh tải lên: cắt tròn/bo góc; logo: nền trắng). */
 function SliceIcon({ icon, cx, size, flip, clipId, onError }) {
     const half = size / 2;
     const rotate = flip ? `rotate(180 ${cx} ${C})` : undefined; // nửa trái: lật để hình luôn thẳng
@@ -50,23 +50,31 @@ function SliceIcon({ icon, cx, size, flip, clipId, onError }) {
         );
     }
 
-    const isFlag = icon.type === "flag" || icon.type === "food";
-
-    const box = isFlag ? size : size * 0.78;
+    const framed = icon.type !== "logo";
+    const round = icon.type !== "upload" || icon.round;
+    const radius = round ? half : size * 0.18; // rx = nửa cạnh -> hình tròn
+    const box = framed ? size : size * 0.78;
     return (
         <g transform={rotate}>
             <clipPath id={clipId}>
-                <circle cx={cx} cy={C} r={half} />
+                <rect x={cx - half} y={C - half} width={size} height={size} rx={radius} />
             </clipPath>
-            <circle cx={cx} cy={C} r={half + 2} fill="#fff" />
+            <rect
+                x={cx - half - 2}
+                y={C - half - 2}
+                width={size + 4}
+                height={size + 4}
+                rx={radius + 2}
+                fill="#fff"
+            />
             <image
                 href={icon.src}
                 x={cx - box / 2}
                 y={C - box / 2}
                 width={box}
                 height={box}
-                preserveAspectRatio={isFlag ? "xMidYMid slice" : "xMidYMid meet"}
-                clipPath={isFlag ? `url(#${clipId})` : undefined}
+                preserveAspectRatio={framed ? "xMidYMid slice" : "xMidYMid meet"}
+                clipPath={framed ? `url(#${clipId})` : undefined}
                 onError={onError}
             />
         </g>

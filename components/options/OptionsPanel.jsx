@@ -14,6 +14,7 @@ export default function OptionsPanel({
     onAdd,
     onRename,
     onWeight,
+    onIcon,
     onRemove,
     onClear,
     drafts,
@@ -57,6 +58,7 @@ export default function OptionsPanel({
                 advanced={advanced}
                 onRename={onRename}
                 onWeight={onWeight}
+                onIcon={onIcon}
                 onRemove={onRemove}
             />
 

@@ -44,6 +44,7 @@ export default function LuckyWheel() {
         removeOption: removeOptionRaw,
         renameOption,
         setWeight,
+        setIcon,
         clearAll: clearAllRaw,
         replaceAll: replaceAllRaw,
         undoState,
@@ -246,6 +247,7 @@ export default function LuckyWheel() {
                             onAdd={addOptions}
                             onRename={renameOption}
                             onWeight={setWeight}
+                            onIcon={setIcon}
                             onRemove={removeOption}
                             onClear={clearAll}
                             drafts={drafts}

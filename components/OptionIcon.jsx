@@ -31,18 +31,19 @@ export default function OptionIcon({ icon, size = 20, glow = false }) {
         );
     }
 
-    const isFlag = resolved.type === "flag" || resolved.type === "food";
-    
+    // Cờ, ảnh món ăn, ảnh tải lên: cắt khung (tròn hoặc bo góc). Logo giữ nguyên hình dạng.
+    const framed = resolved.type !== "logo";
+    const round = resolved.type !== "upload" || resolved.round;
     const glowColor = "color-mix(in srgb, var(--winner, #6366d9) 60%, transparent)";
 
     const style = {
         flexShrink: 0,
-        objectFit: isFlag ? "cover" : "contain",
-        borderRadius: isFlag ? "50%" : 0,
+        objectFit: framed ? "cover" : "contain",
+        borderRadius: framed ? (round ? "50%" : `${Math.round(size * 0.18)}px`) : 0,
     };
 
-    if (isFlag) {
-        // Viền trắng + viền mảnh + quầng sáng: nhìn rõ ranh giới ngay cả khi cờ có nền trắng.
+    if (framed) {
+        // Viền trắng + viền mảnh + quầng sáng: nhìn rõ ranh giới ngay cả khi ảnh có nền trắng.
         style.boxShadow = glow
             ? `0 0 0 3px #fff, 0 0 0 4px rgba(0, 0, 0, 0.12), 0 6px 18px rgba(0, 0, 0, 0.25), 0 0 28px 6px ${glowColor}`
             : "0 0 0 1.5px var(--border), 0 1px 3px rgba(0, 0, 0, 0.2)";
