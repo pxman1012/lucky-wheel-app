@@ -31,7 +31,8 @@ export default function OptionIcon({ icon, size = 20, glow = false }) {
         );
     }
 
-    const isFlag = resolved.type === "flag";
+    const isFlag = resolved.type === "flag" || resolved.type === "food";
+    
     const glowColor = "color-mix(in srgb, var(--winner, #6366d9) 60%, transparent)";
 
     const style = {

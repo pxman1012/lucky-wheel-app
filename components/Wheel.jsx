@@ -50,7 +50,8 @@ function SliceIcon({ icon, cx, size, flip, clipId, onError }) {
         );
     }
 
-    const isFlag = icon.type === "flag";
+    const isFlag = icon.type === "flag" || icon.type === "food";
+
     const box = isFlag ? size : size * 0.78;
     return (
         <g transform={rotate}>
